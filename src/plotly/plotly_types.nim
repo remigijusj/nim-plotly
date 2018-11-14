@@ -131,6 +131,11 @@ type
       errorsMinus*: seq[T]
       errorsPlus*: seq[T]
 
+  ColorBar* = ref object
+    x*: float
+    len*: float
+    thickness*: int
+
   Marker*[T: SomeNumber] = ref object
     size*: seq[T]
     color*: seq[Color]
@@ -153,6 +158,7 @@ type
     name*: string
     xaxis*: string
     yaxis*: string
+    hoverinfo*: string
     # case on `type`, since we only need ColorMap for
     # PlotType.HeatMap
     case `type`*: PlotType
@@ -164,6 +170,7 @@ type
       contours*: tuple[start, stop, size: float]
       heatmap*: bool
       smoothing*: float
+      colorbar*: ColorBar
     # case on `type`, since we only need Close,High,Low,Open for
     # PlotType.Candlestick
     of Candlestick:
@@ -201,6 +208,12 @@ type
     size*: int
     color*: Color
 
+  Margin* = ref object
+    left*: int
+    right*: int
+    top*: int
+    bottom*: int
+
   RangeSlider* = ref object
     visible*: bool
 
@@ -223,6 +236,7 @@ type
     range*: tuple[start, stop: float]
     # oposite of showticklabels
     hideticklabels*: bool
+    anchor*: string
 
   Annotation* = ref object
     x*: float
@@ -239,8 +253,10 @@ type
     hovermode*: HoverMode
     annotations*: seq[Annotation]
     autosize*: bool
-    showlegend*: bool
+    hidelegend*: bool
     xaxis*: Axis
     yaxis*: Axis
+    xaxis2*: Axis
     yaxis2*: Axis
     barmode*: BarMode
+    margin*: Margin

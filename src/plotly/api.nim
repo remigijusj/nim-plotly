@@ -120,6 +120,28 @@ func `%`*(f: Font): JsonNode =
     fields["family"] = % f.family
   result = JsonNode(kind: Jobject, fields: fields)
 
+func `%`*(m: Margin): JsonNode =
+  var fields = initOrderedTable[string, JsonNode](4)
+  if m.left != 0:
+    fields["l"] = % m.left
+  if m.right != 0:
+    fields["r"] = % m.right
+  if m.top != 0:
+    fields["t"] = % m.top
+  if m.bottom != 0:
+    fields["b"] = % m.bottom
+  result = JsonNode(kind: Jobject, fields: fields)
+
+func `%`*(cb: ColorBar): JsonNode =
+  var fields = initOrderedTable[string, JsonNode](4)
+  if cb.x != 0:
+    fields["x"] = % cb.x
+  if cb.len != 0:
+    fields["len"] = % cb.len
+  if cb.thickness != 0:
+    fields["thickness"] = % cb.thickness
+  result = JsonNode(kind: Jobject, fields: fields)
+
 func `%`*(a: Axis): JsonNode =
   var fields = initOrderedTable[string, JsonNode](4)
   if a.title.len > 0:
@@ -133,6 +155,8 @@ func `%`*(a: Axis): JsonNode =
     fields["overlaying"] = % "y"
   if a.hideticklabels:
     fields["showticklabels"] = % false
+  if a.anchor.len > 0:
+    fields["anchor"] = % a.anchor
 
   if a.range.start != a.range.stop:
     fields["autorange"] = % false
@@ -160,16 +184,23 @@ func `%`*(l: Layout): JsonNode =
     fields["xaxis"] = % l.xaxis
   if l.yaxis != nil:
     fields["yaxis"] = % l.yaxis
+  if l.xaxis2 != nil:
+    fields["xaxis2"] = % l.xaxis2
   if l.yaxis2 != nil:
     fields["yaxis2"] = % l.yaxis2
   if $l.barmode != "":
     fields["barmode"] = % l.barmode
+  if l.margin != nil:
+    fields["margin"] = % l.margin
   # default to closest because other modes suck.
   fields["hovermode"] = % "closest"
   if $l.hovermode != "":
     fields["hovermode"] = % l.hovermode
   if 0 < l.annotations.len:
     fields["annotations"] = % l.annotations
+  if l.hidelegend:
+    fields["showlegend"] = % false
+
   result = JsonNode(kind: Jobject, fields: fields)
 
 func `%`*(a: Annotation): JsonNode =
@@ -247,6 +278,9 @@ func `%`*(t: Trace): JsonNode =
   if $t.fill != "":
     fields["fill"] = % t.fill
 
+  if t.hoverinfo != "":
+    fields["hoverinfo"] = % t.hoverinfo
+
   # now check variant object to fill correct fields
   case t.`type`
   of PlotType.HeatMap, PlotType.HeatMapGL:
@@ -274,6 +308,8 @@ func `%`*(t: Trace): JsonNode =
       fields["line"] = %* {
         "smoothing": % t.smoothing
       }
+    if t.colorbar != nil:
+      fields["colorbar"] = % t.colorbar
   of PlotType.Candlestick:
     fields["open"] = % t.open
     fields["high"] = % t.high
